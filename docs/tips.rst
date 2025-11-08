@@ -185,6 +185,35 @@ Here, ``_base.html`` would be the main site base:
      {% block main %}{% endblock %}
    </main>
 
+
+Caching Partials
+~~~~~~~~~~~~~~~~
+
+.. code-block:: python
+
+    from django.shortcuts import render
+    from django.utils.cache import cache, patch_vary_headers
+
+    from example.models import Country
+
+    @cache()
+    @vary_on_headers("HX-Request")
+    def country_listing(request):
+        template_name = "countries.html"
+        if request.htmx:
+            template_name += "#country-table"
+
+        countries = Country.objects.all()
+
+        return render(
+            request,
+            template_name,
+            {
+                "countries": countries,
+            },
+        )
+
+
 .. _htmx-extensions:
 
 Install htmx extensions
